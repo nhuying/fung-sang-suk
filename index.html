@@ -12,72 +12,81 @@
   <style>
     body { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
     .campfire-bg { background: linear-gradient(135deg, #f8f1e3 0%, #e8d9c9 100%); }
-    .toast { animation: toastPop 0.4s, toastFade 3s 0.5s forwards; }
-    @keyframes toastPop { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
-    @keyframes toastFade { to { opacity:0; transform:translateY(-20px); } }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
     
-    #loading-overlay { position: fixed; inset:0; background:rgba(255,255,255,0.95); z-index:999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+    /* Loading Overlay Styles */
+    #loading-overlay { position: fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s; }
   </style>
 </head>
 <body class="campfire-bg min-h-screen text-stone-800">
 
   <div id="loading-overlay" class="hidden">
+    <button onclick="forceCloseLoading()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-800 text-3xl font-bold p-2">✕</button>
+    
     <div class="text-6xl mb-4 animate-bounce">📡</div>
     <div id="loading-text" class="text-xl font-semibold text-amber-700 animate-pulse">กำลังเชื่อมต่อ...</div>
-    <div class="mt-6 flex flex-col gap-2 hidden" id="retry-area">
-        <p class="text-stone-500 text-sm mb-2">หากรอนานเกินไป</p>
-        <button onclick="window.location.reload()" class="px-6 py-2 bg-stone-200 rounded-full text-sm hover:bg-stone-300">โหลดหน้าใหม่</button>
-        <button onclick="manualEnterRoom()" class="px-6 py-2 bg-amber-500 text-white rounded-full text-sm hover:bg-amber-600">กรอกรหัสใหม่</button>
+    
+    <div class="mt-8 flex flex-col gap-3 hidden" id="retry-area">
+        <p class="text-stone-500 text-sm">หากรอนานเกินไป</p>
+        <div class="flex gap-3">
+           <button onclick="window.location.reload()" class="px-6 py-2 bg-stone-200 rounded-full text-sm hover:bg-stone-300">โหลดใหม่</button>
+           <button onclick="forceCloseLoading()" class="px-6 py-2 bg-amber-500 text-white rounded-full text-sm hover:bg-amber-600">ปิดหน้านี้</button>
+        </div>
     </div>
   </div>
 
-  <div id="screen-landing" class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-    <div class="text-6xl mb-4">🔥</div>
-    <h1 class="text-5xl font-semibold text-amber-900 mb-2">ฟังสร้างสุข</h1>
-    <p class="text-xl text-stone-600 mb-10">ฟังด้วยหู ❤️ ดูด้วยใจ</p>
-    <div class="flex gap-4 flex-wrap justify-center">
-      <button onclick="createRoom()" class="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl text-lg font-medium shadow-lg transition transform hover:scale-105">สร้างห้องใหม่</button>
-      <button onclick="manualJoin()" class="px-8 py-4 border-2 border-amber-700 text-amber-800 rounded-3xl text-lg font-medium hover:bg-amber-50">เข้าร่วมด้วยรหัส</button>
+  <div id="screen-landing" class="min-h-screen flex flex-col items-center justify-center p-6 text-center fade-in">
+    <div class="text-7xl mb-6 drop-shadow-md">🔥</div>
+    <h1 class="text-4xl md:text-5xl font-bold text-amber-900 mb-2">ฟังสร้างสุข</h1>
+    <p class="text-xl text-stone-600 mb-10 font-light">ฟังด้วยหู ❤️ ดูด้วยใจ</p>
+    <div class="flex flex-col md:flex-row gap-4 w-full max-w-sm md:max-w-md justify-center">
+      <button onclick="createRoom()" class="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl text-lg font-medium shadow-lg hover:shadow-xl transition transform hover:scale-105">สร้างห้องใหม่</button>
+      <button onclick="manualJoin()" class="px-8 py-4 bg-white border-2 border-amber-600 text-amber-800 rounded-3xl text-lg font-medium hover:bg-amber-50 shadow-sm">เข้าร่วมด้วยรหัส</button>
     </div>
   </div>
 
-  <div id="screen-create" class="hidden min-h-screen p-6">
-    <button onclick="backToLanding()" class="mb-6 text-stone-500">← กลับ</button>
-    <h2 class="text-3xl font-semibold mb-6">สร้างห้องสนทนา</h2>
-    <div class="bg-white rounded-3xl shadow-xl p-8 max-w-md mx-auto">
-      <input id="host-name" placeholder="ชื่อของคุณ (Host)" class="w-full border border-stone-200 rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:border-amber-500">
-      <button onclick="initHost()" class="w-full py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl text-xl font-medium shadow-md">สร้างห้องเลย</button>
+  <div id="screen-create" class="hidden min-h-screen p-6 flex flex-col justify-center items-center">
+    <div class="w-full max-w-md">
+        <button onclick="backToLanding()" class="mb-6 text-stone-500 hover:text-stone-800">← กลับ</button>
+        <div class="bg-white rounded-3xl shadow-xl p-8">
+            <h2 class="text-2xl font-bold text-stone-800 mb-6 text-center">สร้างห้องสนทนา</h2>
+            <input id="host-name" placeholder="ชื่อของคุณ (Host)" class="w-full bg-stone-50 border border-stone-200 rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-amber-400">
+            <button onclick="initHost()" class="w-full py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl text-xl font-medium shadow-md">เปิดห้องเลย</button>
+        </div>
     </div>
   </div>
 
   <div id="screen-waiting" class="hidden min-h-screen p-6 flex flex-col">
     <div class="max-w-2xl mx-auto w-full flex-1 flex flex-col">
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center mb-6 bg-white/50 p-4 rounded-3xl border border-white">
         <div>
-          <div class="text-sm text-stone-500">Room ID</div>
+          <div class="text-xs text-stone-500 uppercase tracking-wider">Room ID</div>
           <div id="room-id" class="font-mono text-4xl font-bold text-amber-700 tracking-wider">...</div>
         </div>
-        <div id="qrcode" class="bg-white p-2 rounded-2xl shadow-sm"></div>
+        <div id="qrcode" class="bg-white p-2 rounded-xl shadow-sm"></div>
       </div>
 
-      <button onclick="copyJoinLink()" class="mb-4 w-full py-3 bg-white border border-amber-500 text-amber-600 rounded-2xl font-medium active:bg-amber-50">📋 คัดลอกลิงก์เชิญเพื่อน</button>
+      <button onclick="copyJoinLink()" class="mb-4 w-full py-3 bg-white border border-amber-400 text-amber-700 rounded-2xl font-medium active:bg-amber-50">📋 คัดลอกลิงก์เชิญเพื่อน</button>
 
-      <button onclick="toggleCampfire()" id="sound-btn" class="mb-6 w-full py-3 bg-stone-100 hover:bg-stone-200 rounded-3xl flex items-center justify-center gap-3 text-stone-600 transition">
+      <button onclick="toggleCampfire()" id="sound-btn" class="mb-6 w-full py-3 bg-stone-800 text-white rounded-3xl flex items-center justify-center gap-3 hover:bg-stone-900 transition shadow-lg">
         🔥 เปิดเสียงกองไฟ
       </button>
 
-      <div class="bg-white/70 backdrop-blur rounded-3xl p-6 mb-8 shadow-sm">
-        <p class="text-sm text-amber-600 font-medium mb-2">ห้องพักใจ</p>
-        <div id="attunement-quote" class="text-lg italic text-stone-600 min-h-[60px] flex items-center"></div>
+      <div class="bg-white/70 backdrop-blur rounded-3xl p-6 mb-6 shadow-sm min-h-[100px] flex items-center justify-center text-center">
+        <div id="attunement-quote" class="text-lg italic text-stone-600"></div>
       </div>
 
-      <div class="flex-1 bg-white rounded-3xl shadow-xl p-6 overflow-y-auto max-h-[40vh]">
-        <div class="font-medium mb-4 sticky top-0 bg-white pb-2 border-b border-stone-100">คนในวง <span id="player-count" class="text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full text-sm">0</span></div>
-        <div id="player-list" class="grid grid-cols-2 gap-4"></div>
+      <div class="flex-1 bg-white rounded-3xl shadow-xl p-6 overflow-hidden flex flex-col">
+        <div class="font-medium mb-4 flex justify-between items-center border-b border-stone-100 pb-2">
+            <span>สมาชิกในวง</span>
+            <span id="player-count" class="text-amber-700 bg-amber-100 px-3 py-1 rounded-full text-sm">0 คน</span>
+        </div>
+        <div id="player-list" class="grid grid-cols-2 gap-3 overflow-y-auto"></div>
       </div>
 
       <button id="start-btn" onclick="hostStartGate()" class="mt-6 w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-3xl text-xl font-medium shadow-lg hidden transition transform active:scale-95">
-        ทุกคนพร้อมแล้ว • เริ่มวงสนทนา
+        เริ่มวงสนทนา ➜
       </button>
       <div id="waiting-msg" class="mt-8 text-center text-stone-500 italic animate-pulse">รอเจ้าของห้องเริ่มกิจกรรม...</div>
     </div>
@@ -85,80 +94,81 @@
 
   <div id="screen-gate" class="hidden min-h-screen flex flex-col items-center justify-center p-6 bg-[#f9f4eb]">
     <div class="text-center max-w-md w-full">
-      <div class="mx-auto mb-6 text-8xl">🔥</div>
-      <h1 class="text-4xl font-semibold text-stone-900 mb-2">ประตูสู่การฟัง</h1>
-      <p class="text-stone-600 mb-8">ก่อนที่เราจะเริ่ม<br>เราสัญญากับตัวเองและกันและกันว่า...</p>
+      <div class="mx-auto mb-6 text-7xl">🤝</div>
+      <h1 class="text-3xl font-bold text-stone-900 mb-2">สัญญาใจ</h1>
+      <p class="text-stone-500 mb-8">ก่อนเริ่ม... เราจะดูแลใจกันด้วยสิ่งนี้</p>
 
       <div class="bg-white rounded-3xl p-8 shadow-sm text-left space-y-5 mb-10 w-full">
-        <div class="flex items-start gap-4"><span class="text-emerald-500 text-2xl mt-0.5">✓</span><span class="text-stone-700">จะฟังด้วยหัวใจ</span></div>
-        <div class="flex items-start gap-4"><span class="text-emerald-500 text-2xl mt-0.5">✓</span><span class="text-stone-700">จะไม่ตัดสิน</span></div>
-        <div class="flex items-start gap-4"><span class="text-emerald-500 text-2xl mt-0.5">✓</span><span class="text-stone-700">จะอยู่กับปัจจุบัน</span></div>
-        <div class="flex items-start gap-4"><span class="text-emerald-500 text-2xl mt-0.5">✓</span><span class="text-stone-700">จะเคารพความรู้สึกของกันและกัน</span></div>
+        <div class="flex items-center gap-4"><span class="text-emerald-500 text-2xl">✓</span><span class="text-stone-700 text-lg">ฟังด้วยหัวใจ</span></div>
+        <div class="flex items-center gap-4"><span class="text-emerald-500 text-2xl">✓</span><span class="text-stone-700 text-lg">ไม่ตัดสิน</span></div>
+        <div class="flex items-center gap-4"><span class="text-emerald-500 text-2xl">✓</span><span class="text-stone-700 text-lg">เก็บความลับ</span></div>
+        <div class="flex items-center gap-4"><span class="text-emerald-500 text-2xl">✓</span><span class="text-stone-700 text-lg">เคารพความรู้สึก</span></div>
       </div>
 
-      <button id="gate-btn" onclick="hostStartGame()" class="w-full py-6 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-3xl text-2xl font-medium shadow-xl hover:scale-105 transition hidden">
+      <button id="gate-btn" onclick="hostStartGame()" class="hidden w-full py-5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-3xl text-2xl font-medium shadow-xl hover:scale-105 transition">
         ฉันพร้อมแล้ว
       </button>
-      <div id="gate-msg" class="text-stone-500 italic">รอสัญญาณจาก Host...</div>
+      <div id="gate-msg" class="text-stone-400 italic">รอสัญญาณจาก Host...</div>
     </div>
   </div>
 
   <div id="screen-game" class="hidden min-h-screen flex flex-col">
-    <div class="bg-white shadow p-4 flex items-center justify-between z-10">
-      <div class="w-8"></div> 
-      <div id="phase-name" class="text-center flex-1 text-2xl font-semibold"></div>
-      <div class="w-8"></div>
+    <div class="bg-white shadow-sm p-4 flex items-center justify-between z-10">
+       <div class="w-10"></div>
+       <div id="phase-name" class="text-center text-xl font-bold px-4 py-1 rounded-full bg-stone-100 text-stone-600">Phase</div>
+       <div class="w-10"></div>
     </div>
+    
     <div class="flex-1 flex items-center justify-center p-6 bg-stone-50">
-      <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-10 min-h-[400px] flex flex-col relative">
-        <div id="phase-color-bar" class="absolute top-0 left-0 w-full h-3 rounded-t-3xl"></div>
+      <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 min-h-[450px] flex flex-col relative overflow-hidden">
+        <div id="phase-color-bar" class="absolute top-0 left-0 w-full h-4"></div>
         
-        <div class="text-center mb-6 mt-4">
-          <div class="text-xs tracking-widest text-stone-400 uppercase mb-1">ผู้พูด</div>
-          <div id="speaker-name" class="text-3xl font-bold text-stone-800"></div>
+        <div class="text-center mb-8 mt-4">
+          <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">ผู้เล่าเรื่อง</div>
+          <div id="speaker-name" class="text-3xl md:text-4xl font-bold text-stone-800">...</div>
         </div>
 
-        <div class="flex-1 flex items-center justify-center my-4">
-             <div id="question" class="text-2xl md:text-3xl leading-relaxed text-center font-light text-stone-700"></div>
+        <div class="flex-1 flex items-center justify-center my-2">
+             <div id="question" class="text-2xl md:text-3xl leading-relaxed text-center font-light text-stone-700">คำถาม...</div>
         </div>
 
-        <div class="mt-6 text-center border-t border-stone-100 pt-6">
-          <div class="text-xs tracking-widest text-stone-400 uppercase mb-2">ผู้ฟังหลัก</div>
-          <div id="listener-name" class="inline-block bg-stone-100 text-stone-600 px-6 py-2 rounded-full text-xl font-medium"></div>
+        <div class="mt-8 text-center pt-6 border-t border-stone-100">
+          <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">ผู้ฟังหลัก</div>
+          <div id="listener-name" class="inline-block bg-amber-50 text-amber-800 px-6 py-2 rounded-full text-lg font-medium">...</div>
         </div>
       </div>
     </div>
-    <div class="bg-white border-t p-6 pb-10">
-      <div class="flex justify-between text-sm mb-3">
-        <div id="timer-label" class="text-stone-500">เวลาพูด 90 วินาที</div>
-        <div id="time-left" class="font-mono text-2xl font-bold text-amber-500">90</div>
+
+    <div class="bg-white border-t border-stone-200 p-6 pb-10">
+      <div class="flex justify-between text-sm mb-2 text-stone-500 font-medium">
+        <span id="timer-label">เวลาแบ่งปัน</span>
+        <span id="time-left" class="text-2xl font-bold text-amber-500 font-mono">90</span>
       </div>
-      <div class="h-3 bg-stone-100 rounded-full overflow-hidden mb-4">
-        <div id="progress" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 w-full transition-all duration-1000 ease-linear"></div>
+      <div class="h-3 bg-stone-100 rounded-full overflow-hidden mb-6">
+        <div id="progress" class="h-full bg-amber-500 w-full transition-all duration-1000 ease-linear"></div>
       </div>
       
-      <button id="timer-btn" onclick="hostStartTimer()" class="w-full py-4 bg-stone-800 hover:bg-black text-white rounded-3xl text-lg font-medium shadow-lg transition hidden">
+      <button id="timer-btn" onclick="hostStartTimer()" class="hidden w-full py-4 bg-stone-800 text-white rounded-3xl text-lg font-medium shadow-lg hover:bg-black transition">
         เริ่มจับเวลา
       </button>
     </div>
   </div>
 
   <div id="screen-wrapup" class="hidden min-h-screen p-6 overflow-auto bg-[#fdfbf7]">
-    <div class="max-w-2xl mx-auto pb-10">
-      <h1 class="text-4xl font-semibold text-center mb-8 text-amber-900">ขอบคุณที่ฟังด้วยใจ</h1>
+    <div class="max-w-2xl mx-auto pb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-amber-900 mt-4">ขอบคุณที่ฟังด้วยใจ</h1>
 
       <div class="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-stone-100">
-        <p class="font-medium mb-4 text-center text-stone-600">ส่งกอดให้เพื่อนในวง 🤗</p>
+        <p class="font-medium mb-4 text-center text-stone-600">ส่งกอดให้เพื่อน 🤗</p>
         <div id="gift-grid" class="grid grid-cols-3 md:grid-cols-4 gap-4"></div>
       </div>
-
-      <div class="bg-white/60 rounded-3xl p-6 mb-8 border border-stone-100">
-        <p class="font-medium mb-3 text-sm text-stone-500">กอดที่ได้รับ</p>
-        <div id="received-gifts" class="space-y-2"></div>
+      <div class="bg-white/60 rounded-3xl p-4 mb-8 border border-stone-100 text-sm">
+        <p class="font-medium mb-2 text-stone-500">กอดที่คุณได้รับ</p>
+        <div id="received-gifts" class="flex flex-wrap gap-2"></div>
       </div>
 
       <div class="mb-8 px-2">
-        <p class="font-medium text-lg mb-4 text-stone-700">ให้คะแนนการฟังของตัวเองวันนี้</p>
+        <p class="font-medium text-lg mb-3 text-stone-700">ให้คะแนนการฟังของตัวเองวันนี้</p>
         <input type="range" id="self-slider" min="0" max="100" value="80" class="w-full accent-amber-500 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
         <div class="flex justify-between text-xs text-stone-400 mt-2"><div>ยังเผลอใจลอย</div><div>อยู่กับปัจจุบันดีมาก</div></div>
       </div>
@@ -166,58 +176,46 @@
       <div class="mb-8">
         <p class="font-medium text-lg mb-3 text-stone-700">ส่งคำขอบคุณพิเศษให้...</p>
         <div class="flex flex-col gap-3">
-            <select id="appreciation-to" class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-lg bg-white"></select>
-            <input id="keyword" placeholder="พิมพ์ข้อความสั้นๆ..." class="w-full border border-stone-200 rounded-2xl px-4 py-3 bg-white">
-            <button onclick="sendAppreciation()" class="w-full py-3 bg-stone-800 text-white rounded-2xl text-lg font-medium shadow hover:bg-stone-900">ส่ง</button>
+            <select id="appreciation-to" class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-lg bg-white focus:ring-2 focus:ring-amber-500"></select>
+            <input id="keyword" placeholder="พิมพ์ข้อความสั้นๆ..." class="w-full border border-stone-200 rounded-2xl px-4 py-3 bg-white focus:ring-2 focus:ring-amber-500">
+            <button onclick="sendAppreciation()" class="w-full py-3 bg-stone-800 text-white rounded-2xl text-lg font-medium shadow hover:bg-stone-900">ส่งข้อความ</button>
         </div>
       </div>
-
-      <div class="bg-white/60 rounded-3xl p-6 mb-8">
-        <p class="font-medium mb-3 text-sm text-stone-500">คำขอบคุณถึงคุณ</p>
+      <div class="bg-white/60 rounded-3xl p-6 mb-8 text-sm">
+        <p class="font-medium mb-3 text-stone-500">ข้อความถึงคุณ</p>
         <div id="received-appreciations" class="space-y-3"></div>
       </div>
 
-      <div class="text-center">
+      <div class="text-center bg-white rounded-3xl p-6 shadow-sm border border-stone-100">
         <p class="font-medium text-lg mb-4 text-stone-700">บรรยากาศในวงวันนี้เป็นสีอะไร?</p>
-        <div id="aura-grid" class="grid grid-cols-5 gap-3 max-w-sm mx-auto mb-6"></div>
-        <div id="aura-result" class="min-h-[3rem] text-xl font-medium text-stone-700 animate-fade-in"></div>
+        <div id="aura-grid" class="flex justify-center gap-3 mb-4 flex-wrap"></div>
+        <div id="aura-result" class="min-h-[3rem] text-xl font-medium text-stone-700"></div>
       </div>
 
       <button onclick="finishGame()" class="mt-12 w-full py-5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-3xl text-xl font-medium shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1">
-        #ทุกปัญหาดีขึ้นได้ด้วย..การฟัง
+        จบกิจกรรม
       </button>
     </div>
   </div>
 
-  <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-stone-900/90 text-white px-6 py-3 rounded-full shadow-2xl text-sm z-50 backdrop-blur-sm"></div>
+  <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-stone-900/90 text-white px-6 py-3 rounded-full shadow-2xl text-sm z-50 backdrop-blur-sm whitespace-nowrap"></div>
 
   <script>
-    // --- Config & Network ---
-    // ใช้ STUN ของ Google เพื่อช่วยเรื่องการเชื่อมต่อผ่านเน็ตมือถือ
+    // --- Config ---
     const peerConfig = {
+        debug: 1, // ลด Debug level ลง
         config: { 'iceServers': [ { url: 'stun:stun.l.google.com:19302' }, { url: 'stun:stun1.l.google.com:19302' } ] }
     };
 
-    let peer = null;
-    let conn = null;      // สำหรับ Guest เก็บ Connection ไปหา Host
-    let connections = []; // สำหรับ Host เก็บ Connection ของ Guest ทุกคน
-    let myId = null;
-    let roomId = "";
-    let isHost = false;
-    let myName = "";
-    let players = [];     // Array of {id: string, name: string}
-
-    // --- Game Logic Variables ---
-    let receivedGifts = {};         // { "Name": count }
-    let receivedAppreciations = []; // { to, from, message }
-    let auraVotes = [0,0,0,0,0];    // Vote counts index 0-4
-    
+    // --- State ---
+    let peer, conn, myId, roomId, isHost = false, myName = "";
+    let players = [], connections = [];
+    let receivedGifts = {}, receivedAppreciations = [], auraVotes = [0,0,0,0,0];
     let campfireAudio = null, isPlaying = false;
-    let currentPhaseIndex = 0, currentRound = 0;
-    let timerInterval = null, timeLeft = 90;
-    let shuffledSpeakers = []; // เก็บ Object Player
+    let currentPhaseIndex = 0, currentRound = 0, timerInterval = null, timeLeft = 90;
+    let shuffledSpeakers = [];
 
-    // --- Content Data (Full Original) ---
+    // --- Data ---
     const phases = [
       { name: "Hello", color: "#F4C95D" },
       { name: "Listen", color: "#8AA88A" },
@@ -226,72 +224,31 @@
     ];
 
     const questions = {
-      hello: [
-          "ถ้าวันนี้เป็นรสชาติ จะเป็นรสอะไร (หวาน, ขม, เปรี้ยว, จืด)?",
-          "แบตเตอรี่ในตัวตอนนี้ เต็ม 100 เหลือเท่าไหร่?",
-          "เพลงไหนที่เปิดฟังแล้ว ตรงกับอารมณ์ช่วงนี้ที่สุด?",
-          "ถ้าเปรียบวันนี้เป็นฤดู คิดว่าเป็นฤดูอะไร?",
-          "ดอกไม้ชนิดไหน ที่สื่อถึงตัวเราในวันนี้ได้ดีที่สุด?",
-          "ถ้าตอนนี้วาร์ปไปพักผ่อนได้ 1 ที่ อยากไปโผล่ที่ไหน?",
-          "สัตว์ชนิดไหน ที่บ่งบอกความเป็นตัวเราในวันนี้?",
-          "ถ้าชีวิตช่วงนี้เปรียบเหมือนสภาพอากาศ ตอนนี้คุณเป็นอากาศแบบไหน?",
-          "สีอะไรที่บ่งบอกอารมณ์ของคุณในวันนี้ได้ดีที่สุด?",
-          "เรื่องเล็กๆ เรื่องไหนที่ทำให้คุณยิ้มได้เมื่อวาน?"
-      ],
-      listen: [
-          "เมนูอาหารที่กินทีไร ก็รู้สึกมีความสุขเสมอ?",
-          "ของขวัญชิ้นไหนที่เคยได้รับ แล้วประทับใจไม่ลืม?",
-          "ช่วงเวลาในวัยเด็กตอนไหน ที่นึกถึงที่ไรก็ยิ้มได้?",
-          "เสียงธรรมชาติแบบไหน ที่ฟังแล้วผ่อนคลายที่สุด?",
-          "ใครคือ 'คนโปรด' ที่คุยด้วยแล้วสบายใจที่สุด?",
-          "สถานที่ไหน ที่ไปแล้วรู้สึกเหมือนได้ชาร์จพลังเต็มที่?",
-          "กิจกรรมอะไรที่ยังไม่เคยทำ แต่อยากลองสักครั้งในชีวิต?",
-          "เล่าถึงสถานที่ที่คุณไปแล้วรู้สึกผ่อนคลายที่สุดให้ฟังหน่อย",
-          "หนังสือหรือหนังเรื่องล่าสุดที่คุณดูแล้วชอบ คือเรื่องอะไร เพราะอะไร?"
-      ],
-      learn: [
-          "ถ้าเจอตัวเองในวัยเด็กได้ 1 นาที อยากบอกอะไรเขา/เธอ?",
-          "นิสัยเล็กๆ อะไรที่เปลี่ยนแล้ว ชีวิตดีขึ้น?",
-          "คำแนะนำที่ดีที่สุด ที่เคยได้รับจากคนอื่นคืออะไร?",
-          "เรื่องอะไรที่เมื่อก่อนเคยเครียดมาก แต่ตอนนี้ปล่อยวางได้แล้ว?",
-          "ทักษะใหม่อะไร ที่เพิ่งเรียนรู้แล้วรู้สึกภูมิใจในตัวเอง?",
-          "ความล้มเหลวครั้งไหน ที่พาเรามาไกลกว่าเดิม?",
-          "ใครคือต้นแบบ (Idol) ในการใช้ชีวิตของคุณ?",
-          "อะไรคือบทเรียนสำคัญที่คุณได้เรียนรู้จากการทำงาน/เรียน ในปีที่ผ่านมา?",
-          "ถ้าคุณย้อนเวลากลับไปบอกตัวเองตอนเด็กได้ 1 ประโยค คุณจะบอกว่าอะไร?"
-      ],
-      empathy: [
-          "ตอนนี้มีความกังวลใจเรื่องอะไร ที่อยากระบายหรือวางลงบ้าง?",
-          "วิธีปลอบใจตัวเองในวันที่แย่ คือการทำอะไร?",
-          "ถ้าขอพรวิเศษได้ 1 ข้อเพื่อคนอื่น จะขอให้ใครและขอว่าอะไร?",
-          "เรื่องอะไรที่คนมักเข้าใจผิดเกี่ยวกับตัวเรา และอยากอธิบายให้เข้าใจ?",
-          "ความสุขง่ายๆ รอบตัว ที่เรามักจะเผลอมองข้ามไปคืออะไร?",
-          "ระหว่าง 'กอดแน่นๆ' กับ 'คำพูดดีๆ' ตอนนี้ต้องการแบบไหนมากกว่ากัน?",
-          "เป้าหมายเล็กๆ ที่อยากทำให้สำเร็จเพื่อตัวเองในเดือนนี้คืออะไร?",
-          "ในวันที่เหนื่อยล้า คำพูดแบบไหนที่คุณอยากได้ยินจากคนรอบข้างมากที่สุด?",
-          "มีความฝันอะไรที่คุณยังไม่กล้าลงมือทำ และอะไรฉุดรั้งคุณไว้?"
-      ]
+      hello: ["รสชาติของวันนี้คือ?", "แบตเตอรี่ในตัวเหลือเท่าไหร่?", "เพลงที่ตรงกับอารมณ์ตอนนี้?", "ถ้าเป็นฤดู ตอนนี้คือฤดูอะไร?", "ดอกไม้ที่สื่อถึงเราวันนี้?", "อยากวาร์ปไปพักที่ไหน?", "สัตว์ที่บ่งบอกความเป็นเรา?", "สภาพอากาศในใจตอนนี้?", "สีของอารมณ์วันนี้?", "เรื่องเล็กๆ ที่ทำให้ยิ้มได้?"],
+      listen: ["เมนูที่กินแล้วมีความสุข?", "ของขวัญที่ประทับใจไม่ลืม?", "ความทรงจำวัยเด็กที่ทำให้ยิ้ม?", "เสียงธรรมชาติที่ชอบ?", "คนโปรดที่คุยด้วยแล้วสบายใจ?", "สถานที่ชาร์จพลัง?", "กิจกรรมที่อยากลองทำสักครั้ง?", "ที่ที่ไปแล้วผ่อนคลายที่สุด?", "หนัง/หนังสือเรื่องล่าสุดที่ชอบ?"],
+      learn: ["อยากบอกอะไรตัวเองตอนเด็ก?", "นิสัยที่เปลี่ยนแล้วชีวิตดีขึ้น?", "คำแนะนำที่ดีที่สุดที่เคยได้?", "เรื่องที่เคยเครียดแต่ตอนนี้ขำได้?", "ทักษะใหม่ที่ภูมิใจ?", "ความล้มเหลวที่สอนเรา?", "Idol ในการใช้ชีวิต?", "บทเรียนสำคัญปีที่ผ่านมา?", "ย้อนเวลาไปบอกตัวเองได้ 1 ประโยค?"],
+      empathy: ["เรื่องที่กังวลใจตอนนี้?", "วิธีปลอบใจตัวเอง?", "ถ้าขอพรให้คนอื่นได้ 1 ข้อ?", "เรื่องที่คนมักเข้าใจผิดเกี่ยวกับเรา?", "ความสุขง่ายๆ ที่มองข้าม?", "กอด vs คำพูด ต้องการอะไร?", "เป้าหมายเล็กๆ เดือนนี้?", "คำพูดที่อยากได้ยินตอนนี้?", "ความฝันที่ยังไม่กล้าทำ?"]
     };
 
     const auraColors = ["#fbbf24","#fde047","#34d399","#38bdf8","#c084fc"];
-    const auraNames = ["ส้มพาสเทล – อบอุ่น", "เหลืองอ่อน – สดใส", "เขียวมินต์ – สงบ", "ฟ้าอ่อน – กว้างไกล", "ม่วงพาสเทล – ลึกซึ้ง"];
+    const auraNames = ["อบอุ่น", "สดใส", "สงบ", "กว้างไกล", "ลึกซึ้ง"];
 
-    // --- Helpers ---
+    // --- Helper UI ---
     function hideAll() { document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden')); }
     function showScreen(id) { hideAll(); document.getElementById(id).classList.remove('hidden'); }
     function showToast(text) {
       const t = document.getElementById('toast');
       t.textContent = text; t.classList.remove('hidden');
-      setTimeout(() => t.classList.add('hidden'), 2800);
+      setTimeout(() => t.classList.add('hidden'), 2500);
     }
     
-    // ระบบ Loading พร้อมปุ่ม Retry กรณีเน็ตมีปัญหา
+    // Loading Control
     function showLoading(show, msg="กำลังเชื่อมต่อ...") { 
         const el = document.getElementById('loading-overlay');
         document.getElementById('loading-text').innerText = msg;
         if(show) {
             el.classList.remove('hidden');
-            // ถ้าค้างเกิน 8 วินาที ให้ขึ้นปุ่มทางเลือก
+            // Timeout 8 วินาที ถ้ายังไม่หายให้โชว์ปุ่มทางเลือก
             setTimeout(() => {
                 if(!el.classList.contains('hidden')) document.getElementById('retry-area').classList.remove('hidden');
             }, 8000);
@@ -299,176 +256,168 @@
             el.classList.add('hidden');
         }
     }
+    
+    // *** สำคัญ: ปุ่มบังคับปิด Loading ***
+    function forceCloseLoading() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+        if(!roomId) showScreen('screen-landing');
+    }
 
-    // --- MAIN SETUP ---
+    // --- Entry Point ---
     window.onload = () => {
+      // ** FIX: เริ่มต้นต้องซ่อน Loading ก่อนเสมอ เว้นแต่จะมี Room ID **
+      document.getElementById('loading-overlay').classList.add('hidden');
+      
       const params = new URLSearchParams(location.search);
       const room = params.get('room');
       
       if (room) {
-        // GUEST MODE
+        // Mode: Guest Join
         roomId = room;
         isHost = false;
-        myName = prompt("ชื่อของคุณคือ?", "ผู้เข้าร่วม") || "ผู้เข้าร่วม";
+        myName = prompt("ชื่อของคุณ:", "ผู้เข้าร่วม") || "ผู้เข้าร่วม";
         showLoading(true, "กำลังเข้าห้อง " + roomId);
         initGuestPeer();
       } else {
-        // LANDING MODE
+        // Mode: Landing
         showScreen('screen-landing');
       }
     };
 
     function backToLanding() { showScreen('screen-landing'); }
     function createRoom() { showScreen('screen-create'); }
-    function manualEnterRoom() { window.location.href = window.location.pathname; }
+    function manualJoin() { 
+        const code = prompt("กรอกรหัสห้อง:");
+        if(code) window.location.href = "?room=" + code.trim();
+    }
 
-    // --- NETWORK LOGIC (HOST) ---
+    // --- Network (Host) ---
     function initHost() {
         myName = document.getElementById('host-name').value.trim();
-        if(!myName) return alert("กรุณาใส่ชื่อ");
+        if(!myName) return alert("ใส่ชื่อก่อนนะครับ");
         isHost = true;
         
-        // สร้าง Short ID (6 ตัวอักษร)
+        // Generate Short ID
         const shortId = Math.random().toString(36).substr(2, 6).toUpperCase();
         roomId = shortId;
         
         showLoading(true, "กำลังสร้างห้อง...");
         
-        // Host ใช้ Short ID เป็น PeerID เลย
-        peer = new Peer(shortId, peerConfig);
-        
-        peer.on('open', (id) => {
-            console.log('Host Ready:', id);
-            players = [{id: 'HOST', name: myName}];
-            showLoading(false);
-            setupWaitingRoom();
-        });
-
-        peer.on('connection', (c) => {
-            connections.push(c);
-            c.on('data', (data) => handleData(data, c));
-            c.on('close', () => { 
-                // ลบคนที่หลุดออก (ถ้าต้องการ) 
-                // players = players.filter(p => p.id !== c.peer);
-                // broadcast({ type: 'UPDATE_PLAYERS', players: players });
-            });
-        });
-
-        peer.on('error', (err) => { 
-            alert("เกิดข้อผิดพลาด (Host): " + err); 
-            showLoading(false); 
-        });
-    }
-
-    // --- NETWORK LOGIC (GUEST) ---
-    function initGuestPeer() {
-        // Guest ให้ PeerJS สุ่ม ID ยาวๆ ให้
-        peer = new Peer(null, peerConfig);
-        
-        peer.on('open', (id) => {
-            myId = id;
-            // เชื่อมต่อไปหา Host ด้วย ShortID
-            conn = peer.connect(roomId, { reliable: true });
+        try {
+            peer = new Peer(shortId, peerConfig);
             
-            conn.on('open', () => {
+            peer.on('open', (id) => {
+                players = [{id: 'HOST', name: myName}];
                 showLoading(false);
-                // ส่งชื่อไปรายงานตัว
-                conn.send({ type: 'JOIN', name: myName });
-                setupWaitingRoom(); 
+                setupWaitingRoom();
             });
 
-            conn.on('data', (data) => handleData(data));
-            
-            conn.on('close', () => {
-                alert("การเชื่อมต่อหลุด (Host ปิดห้องหรือเน็ตหลุด)");
-                location.reload();
+            peer.on('connection', (c) => {
+                connections.push(c);
+                c.on('data', (data) => handleData(data, c));
+                c.on('close', () => { /* Handle disconnect optional */ });
             });
-        });
 
-        peer.on('error', (err) => {
-            console.error(err);
-            // ส่วนใหญ่ Guest จะ Error เพราะหา RoomID ไม่เจอ
-            // ปล่อยให้ UI Loading จัดการแสดงปุ่ม Retry
-        });
+            peer.on('error', (err) => { 
+                alert("เกิดข้อผิดพลาด: " + err); 
+                showLoading(false); 
+            });
+        } catch (e) {
+            alert("Browser ไม่รองรับ: " + e);
+            showLoading(false);
+        }
     }
 
-    // --- DATA HANDLING ---
-    
-    // ฟังก์ชันส่งข้อมูลกระจายหาทุกคน (Host ใช้เท่านั้น)
+    // --- Network (Guest) ---
+    function initGuestPeer() {
+        try {
+            peer = new Peer(null, peerConfig);
+            
+            peer.on('open', (id) => {
+                myId = id;
+                conn = peer.connect(roomId, { reliable: true });
+                
+                conn.on('open', () => {
+                    showLoading(false);
+                    conn.send({ type: 'JOIN', name: myName });
+                    setupWaitingRoom(); 
+                });
+
+                conn.on('data', (data) => handleData(data));
+                
+                // ถ้าเชื่อมไม่ได้ภายใน 10 วิ ให้แจ้งเตือน
+                setTimeout(() => {
+                    if(!conn.open) {
+                        alert("เชื่อมต่อเจ้าของห้องไม่ได้ (อาจจะคนละวงเน็ต หรือห้องปิดแล้ว)");
+                        forceCloseLoading();
+                    }
+                }, 10000);
+            });
+
+            peer.on('error', (err) => {
+                console.error(err);
+                // PeerJS Error ส่วนใหญ่จะจัดการโดย UI Timeout
+            });
+        } catch (e) {
+            alert("Error: " + e);
+            forceCloseLoading();
+        }
+    }
+
     function broadcast(data) {
         if(isHost) {
             connections.forEach(c => c.send(data));
-            handleData(data); // Host ต้องประมวลผลข้อมูลตัวเองด้วย
+            handleData(data); 
         }
     }
 
-    // ฟังก์ชันรับและจัดการข้อมูล
     function handleData(data, senderConn=null) {
-        
-        // 1. GUEST JOIN
         if (data.type === 'JOIN' && isHost) {
-            // เพิ่มผู้เล่นใหม่
             players.push({ id: senderConn.peer, name: data.name });
-            // ส่งรายชื่อล่าสุดให้ทุกคน
             broadcast({ type: 'UPDATE_PLAYERS', players: players });
-            showToast(`${data.name} เข้าร่วมแล้ว`);
+            showToast(data.name + " มาแล้ว");
         }
-        
-        // 2. PLAYER UPDATE
         if (data.type === 'UPDATE_PLAYERS') {
             players = data.players;
             renderPlayerList();
         }
-
-        // 3. NAVIGATION (เปลี่ยนหน้า)
         if (data.type === 'GOTO') {
             showScreen(data.screen);
             if(data.screen === 'screen-gate') setupGateUI();
             if(data.screen === 'screen-game') setupGameUI(data.payload);
             if(data.screen === 'screen-wrapup') initWrapUp();
         }
-
-        // 4. TIMER
-        if (data.type === 'SYNC_TIMER') {
-            startTimerLocal();
-        }
-
-        // 5. INTERACTION (WRAP-UP) - เพิ่มใหม่ให้ Online Work
+        if (data.type === 'SYNC_TIMER') startTimerLocal();
         if (data.type === 'GIFT') {
             receivedGifts[data.to] = (receivedGifts[data.to] || 0) + 1;
             renderReceivedGifts();
-            if(myName === data.to) showToast("คุณได้รับกอด 🤗");
+            if(myName === data.to) showToast("ได้รับกอด 🤗");
         }
-
         if (data.type === 'APPRECIATION') {
             receivedAppreciations.push(data.payload);
             renderReceivedAppreciations();
-            if(myName === data.payload.to) showToast(`คุณได้รับข้อความจาก ${data.payload.from}`);
+            if(myName === data.payload.to) showToast("มีข้อความใหม่ถึงคุณ 💌");
         }
-
         if (data.type === 'AURA_VOTE') {
             auraVotes[data.index]++;
             calculateAura();
         }
     }
 
-    // --- GAME FUNCTIONS ---
-
+    // --- Game Logic ---
     function setupWaitingRoom() {
         document.getElementById('room-id').textContent = roomId;
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
         const url = window.location.origin + window.location.pathname + "?room=" + roomId;
-        new QRCode(qrContainer, { text: url, width: 150, height: 150 });
+        new QRCode(qrContainer, { text: url, width: 100, height: 100 });
 
         renderPlayerList();
         showScreen('screen-waiting');
         startAttunementQuotes();
 
-        // Host Control
         if(isHost) {
-            const btn = document.getElementById('start-btn');
-            btn.classList.remove('hidden');
+            document.getElementById('start-btn').classList.remove('hidden');
             document.getElementById('waiting-msg').classList.add('hidden');
         }
     }
@@ -478,16 +427,16 @@
         container.innerHTML = '';
         players.forEach(p => {
             const div = document.createElement('div');
-            div.className = "bg-stone-50 rounded-2xl p-3 text-center flex items-center gap-3";
-            div.innerHTML = `<div class="w-10 h-10 bg-gradient-to-br from-amber-300 to-orange-400 rounded-full flex items-center justify-center text-xl">👤</div><div class="font-medium truncate">${p.name}</div>`;
+            div.className = "bg-stone-50 rounded-2xl p-3 flex items-center gap-3 animate-fade-in";
+            div.innerHTML = `<div class="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center text-amber-800 font-bold text-xs">${p.name[0]}</div><div class="truncate text-sm font-medium">${p.name}</div>`;
             container.appendChild(div);
         });
-        document.getElementById('player-count').textContent = players.length;
+        document.getElementById('player-count').textContent = players.length + " คน";
     }
 
     function copyJoinLink() {
         const url = window.location.origin + window.location.pathname + "?room=" + roomId;
-        navigator.clipboard.writeText(url).then(() => showToast("คัดลอกลิงก์เรียบร้อย"));
+        navigator.clipboard.writeText(url).then(() => showToast("คัดลอกลิงก์แล้ว ✅"));
     }
 
     function toggleCampfire() {
@@ -497,27 +446,24 @@
       }
       isPlaying = !isPlaying;
       isPlaying ? campfireAudio.play().catch(()=>{}) : campfireAudio.pause();
-      document.getElementById('sound-btn').textContent = isPlaying ? "🔥 ปิดเสียงกองไฟ" : "🔥 เปิดเสียงกองไฟ";
+      document.getElementById('sound-btn').innerHTML = isPlaying ? "🔊 ปิดเสียง" : "🔥 เปิดเสียงกองไฟ";
     }
 
-    const quotes = ["วางมือถือลงชั่วคราว… หายใจเข้าลึก ๆ", "ที่นี่คือพื้นที่ปลอดภัย ทุกคนถูกฟังด้วยใจ", "ฟังเพื่อเข้าใจ ไม่ใช่เพื่อตอบ"];
+    const quotes = ["วางมือถือลงชั่วคราว…", "พื้นที่นี้ปลอดภัยสำหรับคุณ", "ฟังเพื่อเข้าใจ ไม่ใช่เพื่อตอบ", "สูดหายใจเข้าลึกๆ..."];
     let quoteIndex = 0;
     function startAttunementQuotes() {
       const el = document.getElementById('attunement-quote');
       if(!el) return;
-      // Start loop
       setInterval(() => {
         quoteIndex = (quoteIndex + 1) % quotes.length;
         el.style.opacity = 0;
-        setTimeout(() => { el.textContent = quotes[quoteIndex]; el.style.opacity = 1; }, 400);
-      }, 6000);
+        setTimeout(() => { el.textContent = quotes[quoteIndex]; el.style.opacity = 1; }, 500);
+      }, 5000);
       el.textContent = quotes[0];
     }
 
-    // --- GATE ---
-    function hostStartGate() {
-        broadcast({ type: 'GOTO', screen: 'screen-gate' });
-    }
+    // Gate
+    function hostStartGate() { broadcast({ type: 'GOTO', screen: 'screen-gate' }); }
     function setupGateUI() {
         if(isHost) {
             document.getElementById('gate-btn').classList.remove('hidden');
@@ -525,10 +471,9 @@
         }
     }
 
-    // --- GAME LOOP ---
+    // Game Loop
     function hostStartGame() {
         currentPhaseIndex = 0; currentRound = 0;
-        // สุ่มลำดับผู้เล่น (เก็บเป็น Object)
         shuffledSpeakers = [...players].sort(() => Math.random() - 0.5);
         hostNextRound();
     }
@@ -538,77 +483,62 @@
             broadcast({ type: 'GOTO', screen: 'screen-wrapup' });
             return;
         }
-
         const phase = phases[currentPhaseIndex];
         const qList = questions[phase.name.toLowerCase()];
         const question = qList[Math.floor(Math.random() * qList.length)];
-
-        // เลือกผู้พูดจาก List ที่สุ่มไว้
         const speakerObj = shuffledSpeakers[currentRound % shuffledSpeakers.length];
-        
-        // เลือกผู้ฟัง (ต้องไม่ซ้ำผู้พูด)
         let listenerObj = speakerObj;
         if(players.length > 1) {
              while (listenerObj.id === speakerObj.id) listenerObj = players[Math.floor(Math.random() * players.length)];
         }
 
-        const payload = {
-            phaseName: phase.name,
-            phaseColor: phase.color,
-            question: question,
-            speaker: speakerObj.name, // ส่งไปแค่ชื่อ (String)
-            listener: listenerObj.name // ส่งไปแค่ชื่อ (String)
-        };
-
-        broadcast({ type: 'GOTO', screen: 'screen-game', payload: payload });
+        broadcast({ type: 'GOTO', screen: 'screen-game', payload: {
+            phaseName: phase.name, phaseColor: phase.color, question, speaker: speakerObj.name, listener: listenerObj.name
+        }});
     }
 
     function setupGameUI(payload) {
-        document.getElementById('phase-name').innerHTML = `<span style="color:${payload.phaseColor}">${payload.phaseName}</span>`;
+        document.getElementById('phase-name').innerText = payload.phaseName;
+        document.getElementById('phase-name').style.backgroundColor = payload.phaseColor + "40"; // Light BG
         document.getElementById('phase-color-bar').style.backgroundColor = payload.phaseColor;
-        document.getElementById('question').textContent = payload.question;
-        document.getElementById('speaker-name').textContent = payload.speaker;
-        document.getElementById('listener-name').textContent = payload.listener;
+        document.getElementById('question').innerText = payload.question;
+        document.getElementById('speaker-name').innerText = payload.speaker;
+        document.getElementById('listener-name').innerText = payload.listener;
 
-        // Reset Timer UI
         clearInterval(timerInterval);
         timeLeft = 90;
-        document.getElementById('time-left').textContent = "90";
+        document.getElementById('time-left').innerText = "90";
         document.getElementById('progress').style.width = "100%";
         
         const btn = document.getElementById('timer-btn');
         if(isHost) {
             btn.classList.remove('hidden');
-            btn.textContent = "เริ่มจับเวลา";
+            btn.innerText = "เริ่มจับเวลา";
             btn.onclick = hostStartTimer;
             btn.disabled = false;
+        } else {
+            btn.classList.add('hidden');
         }
     }
 
-    function hostStartTimer() {
-        broadcast({ type: 'SYNC_TIMER' });
-    }
+    function hostStartTimer() { broadcast({ type: 'SYNC_TIMER' }); }
 
     function startTimerLocal() {
         const btn = document.getElementById('timer-btn');
-        if(isHost) {
-            btn.textContent = "กำลังพูด...";
-            btn.disabled = true;
-        }
+        if(isHost) { btn.innerText = "⏳ กำลังพูด..."; btn.disabled = true; }
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             timeLeft--;
-            document.getElementById('time-left').textContent = timeLeft;
+            document.getElementById('time-left').innerText = timeLeft;
             document.getElementById('progress').style.width = (timeLeft / 90 * 100) + "%";
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 if(isHost) {
-                    btn.textContent = "ถัดไป";
+                    btn.innerText = "ข้อต่อไป ➜";
                     btn.disabled = false;
                     btn.onclick = () => {
                         currentRound++;
-                        // Logic เดิม: ทุก 3 รอบเปลี่ยนเฟส (ถ้าผู้เล่นเยอะกว่า 3 คน อาจจะไม่ครบทุกคนในเฟสนั้นตาม Code เดิม)
                         if (currentRound % 3 === 0) currentPhaseIndex++; 
                         hostNextRound();
                     };
@@ -617,116 +547,69 @@
         }, 1000);
     }
 
-    // --- WRAP UP (NETWORKED) ---
+    // Wrap Up
     function initWrapUp() {
-      renderGiftGrid();
-      renderReceivedGifts();
-      populateAppreciationSelect();
-      renderReceivedAppreciations();
-      renderAuraGrid();
-      calculateAura();
+      renderGiftGrid(); renderReceivedGifts();
+      populateAppreciationSelect(); renderReceivedAppreciations();
+      renderAuraGrid(); calculateAura();
     }
-
     function renderGiftGrid() {
-      const container = document.getElementById('gift-grid');
-      container.innerHTML = '';
+      const c = document.getElementById('gift-grid'); c.innerHTML = '';
       players.forEach(p => {
-        if (p.name === myName) return; // ไม่ส่งให้ตัวเอง
-        const div = document.createElement('div');
-        div.className = "text-center cursor-pointer active:scale-95 transition bg-white p-2 rounded-xl border border-stone-100 shadow-sm hover:shadow-md";
-        div.innerHTML = `<div class="text-4xl mb-1">🤗</div><div class="text-xs font-medium truncate w-full">${p.name}</div>`;
-        div.onclick = () => sendGift(p.name);
-        container.appendChild(div);
+        if (p.name === myName) return;
+        const d = document.createElement('button');
+        d.className = "flex flex-col items-center p-2 bg-stone-50 rounded-xl hover:bg-amber-50";
+        d.innerHTML = `<span class="text-3xl mb-1">🤗</span><span class="text-xs truncate w-full">${p.name}</span>`;
+        d.onclick = () => sendGift(p.name);
+        c.appendChild(d);
       });
     }
-
-    function sendGift(toName) {
-      // ส่งข้อมูลให้ Host (ถ้าเป็น Guest) หรือ Broadcast (ถ้าเป็น Host)
-      const data = { type: 'GIFT', to: toName };
-      if(isHost) broadcast(data);
-      else conn.send(data);
-      
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    function sendGift(to) {
+        if(isHost) broadcast({ type: 'GIFT', to }); else conn.send({ type: 'GIFT', to });
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     }
-
     function renderReceivedGifts() {
-      const container = document.getElementById('received-gifts');
-      container.innerHTML = '';
-      Object.keys(receivedGifts).forEach(name => {
-        const div = document.createElement('div');
-        div.className = "flex justify-between items-center bg-white rounded-xl px-4 py-2 shadow-sm border border-stone-100";
-        div.innerHTML = `<span class="font-medium text-stone-700">${name}</span><span class="text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded-lg">🤗 ${receivedGifts[name]}</span>`;
-        container.appendChild(div);
-      });
+        const c = document.getElementById('received-gifts'); c.innerHTML = '';
+        Object.keys(receivedGifts).forEach(n => {
+            c.innerHTML += `<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-lg text-xs">🤗 ${n} x${receivedGifts[n]}</span>`;
+        });
     }
-
     function populateAppreciationSelect() {
-      const select = document.getElementById('appreciation-to');
-      select.innerHTML = '';
-      players.forEach(p => {
-        if (p.name !== myName) {
-          const opt = document.createElement('option');
-          opt.value = p.name; opt.textContent = p.name;
-          select.appendChild(opt);
-        }
-      });
+      const s = document.getElementById('appreciation-to'); s.innerHTML = '';
+      players.forEach(p => { if(p.name !== myName) s.innerHTML += `<option value="${p.name}">${p.name}</option>`; });
     }
-
     function sendAppreciation() {
-      const to = document.getElementById('appreciation-to').value;
-      if(!to) return;
-      const msg = document.getElementById('keyword').value.trim() || "ขอบคุณที่ฟัง";
-      
-      const payload = {to, from: myName, message: msg};
-      const data = { type: 'APPRECIATION', payload: payload };
-      
-      if(isHost) broadcast(data);
-      else conn.send(data);
-
-      document.getElementById('keyword').value = '';
-      showToast("ส่งแล้ว ❤️");
+        const to = document.getElementById('appreciation-to').value;
+        const msg = document.getElementById('keyword').value.trim();
+        if(!to || !msg) return;
+        const payload = { type: 'APPRECIATION', payload: {to, from: myName, message: msg} };
+        if(isHost) broadcast(payload); else conn.send(payload);
+        document.getElementById('keyword').value = '';
+        showToast("ส่งแล้ว ❤️");
     }
-
     function renderReceivedAppreciations() {
-      const container = document.getElementById('received-appreciations');
-      container.innerHTML = '';
-      receivedAppreciations.forEach(item => {
-        const div = document.createElement('div');
-        div.className = "bg-white rounded-2xl p-4 shadow-sm border-l-4 border-amber-400";
-        div.innerHTML = `<div class="flex justify-between mb-1"><span class="font-bold text-stone-700">${item.to}</span><span class="text-xs text-stone-400">จาก ${item.from}</span></div><div class="text-stone-600">"${item.message}"</div>`;
-        container.appendChild(div);
-      });
+        const c = document.getElementById('received-appreciations'); c.innerHTML = '';
+        receivedAppreciations.forEach(i => {
+            c.innerHTML += `<div class="bg-amber-50 p-3 rounded-xl"><div class="flex justify-between text-xs text-stone-400 mb-1"><span>จาก ${i.from}</span></div><div class="text-stone-700 font-medium">"${i.message}"</div></div>`;
+        });
     }
-
     function renderAuraGrid() {
-      const container = document.getElementById('aura-grid');
-      container.innerHTML = '';
-      auraColors.forEach((color, i) => {
-        const btn = document.createElement('button');
-        btn.className = "h-12 w-12 rounded-full shadow-inner border-2 border-transparent hover:scale-110 transition";
-        btn.style.backgroundColor = color;
-        btn.onclick = () => { 
-            const data = { type: 'AURA_VOTE', index: i };
-            if(isHost) broadcast(data);
-            else conn.send(data);
-        };
-        container.appendChild(btn);
-      });
+        const c = document.getElementById('aura-grid'); c.innerHTML = '';
+        auraColors.forEach((color, i) => {
+            const b = document.createElement('button');
+            b.className = "w-10 h-10 rounded-full border-2 border-white shadow-md hover:scale-110 transition";
+            b.style.backgroundColor = color;
+            b.onclick = () => { if(isHost) broadcast({type:'AURA_VOTE', index:i}); else conn.send({type:'AURA_VOTE', index:i}); };
+            c.appendChild(b);
+        });
     }
-
     function calculateAura() {
-      let max = 0, idx = 0;
-      auraVotes.forEach((v, i) => { if (v > max) { max = v; idx = i; } });
-      if(max > 0) {
-        document.getElementById('aura-result').innerHTML = `Aura ของกลุ่มวันนี้คือ<br><span class="text-2xl font-bold transition-all duration-500" style="color:${auraColors[idx]}">${auraNames[idx]}</span>`;
-      }
+        let max=0, idx=0;
+        auraVotes.forEach((v,i)=>{if(v>max){max=v;idx=i;}});
+        if(max>0) document.getElementById('aura-result').innerHTML = `<span style="color:${auraColors[idx]}">${auraNames[idx]}</span>`;
     }
 
-    function finishGame() {
-      if(confirm("จบกิจกรรมและกลับสู่หน้าแรก?")) {
-        location.reload();
-      }
-    }
+    function finishGame() { if(confirm("ต้องการจบเกมและกลับหน้าแรก?")) location.reload(); }
   </script>
 </body>
 </html>
