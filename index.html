@@ -15,20 +15,28 @@
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
     
-    /* Loading Overlay Styles */
-    #loading-overlay { position: fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s; }
+    /* --- แก้ไข CSS ตรงนี้ --- */
+    #loading-overlay { 
+        position: fixed; inset:0; background:rgba(255,255,255,0.98); z-index:9999; 
+        /* ลบ display: flex ออกจากตรงนี้ เพื่อไม่ให้มันบังคับโชว์ตลอด */
+        flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s; 
+    }
+    /* สั่งให้แสดงผลเฉพาะตอนที่ไม่มี class hidden */
+    #loading-overlay:not(.hidden) { display: flex; }
+    /* บังคับซ่อนด้วย !important เพื่อความชัวร์ */
+    .hidden { display: none !important; }
   </style>
 </head>
 <body class="campfire-bg min-h-screen text-stone-800">
 
   <div id="loading-overlay" class="hidden">
-    <button onclick="forceCloseLoading()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-800 text-3xl font-bold p-2">✕</button>
+    <button onclick="forceCloseLoading()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-800 text-3xl font-bold p-2 z-50">✕</button>
     
     <div class="text-6xl mb-4 animate-bounce">📡</div>
     <div id="loading-text" class="text-xl font-semibold text-amber-700 animate-pulse">กำลังเชื่อมต่อ...</div>
     
-    <div class="mt-8 flex flex-col gap-3 hidden" id="retry-area">
-        <p class="text-stone-500 text-sm">หากรอนานเกินไป</p>
+    <div class="mt-8 flex flex-col gap-3" id="retry-area">
+        <p class="text-stone-500 text-sm text-center">หากรอนานเกินไป</p>
         <div class="flex gap-3">
            <button onclick="window.location.reload()" class="px-6 py-2 bg-stone-200 rounded-full text-sm hover:bg-stone-300">โหลดใหม่</button>
            <button onclick="forceCloseLoading()" class="px-6 py-2 bg-amber-500 text-white rounded-full text-sm hover:bg-amber-600">ปิดหน้านี้</button>
@@ -122,16 +130,13 @@
     <div class="flex-1 flex items-center justify-center p-6 bg-stone-50">
       <div class="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 min-h-[450px] flex flex-col relative overflow-hidden">
         <div id="phase-color-bar" class="absolute top-0 left-0 w-full h-4"></div>
-        
         <div class="text-center mb-8 mt-4">
           <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">ผู้เล่าเรื่อง</div>
           <div id="speaker-name" class="text-3xl md:text-4xl font-bold text-stone-800">...</div>
         </div>
-
         <div class="flex-1 flex items-center justify-center my-2">
              <div id="question" class="text-2xl md:text-3xl leading-relaxed text-center font-light text-stone-700">คำถาม...</div>
         </div>
-
         <div class="mt-8 text-center pt-6 border-t border-stone-100">
           <div class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">ผู้ฟังหลัก</div>
           <div id="listener-name" class="inline-block bg-amber-50 text-amber-800 px-6 py-2 rounded-full text-lg font-medium">...</div>
@@ -147,7 +152,6 @@
       <div class="h-3 bg-stone-100 rounded-full overflow-hidden mb-6">
         <div id="progress" class="h-full bg-amber-500 w-full transition-all duration-1000 ease-linear"></div>
       </div>
-      
       <button id="timer-btn" onclick="hostStartTimer()" class="hidden w-full py-4 bg-stone-800 text-white rounded-3xl text-lg font-medium shadow-lg hover:bg-black transition">
         เริ่มจับเวลา
       </button>
@@ -157,7 +161,6 @@
   <div id="screen-wrapup" class="hidden min-h-screen p-6 overflow-auto bg-[#fdfbf7]">
     <div class="max-w-2xl mx-auto pb-12">
       <h1 class="text-3xl md:text-4xl font-bold text-center mb-8 text-amber-900 mt-4">ขอบคุณที่ฟังด้วยใจ</h1>
-
       <div class="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-stone-100">
         <p class="font-medium mb-4 text-center text-stone-600">ส่งกอดให้เพื่อน 🤗</p>
         <div id="gift-grid" class="grid grid-cols-3 md:grid-cols-4 gap-4"></div>
@@ -166,13 +169,11 @@
         <p class="font-medium mb-2 text-stone-500">กอดที่คุณได้รับ</p>
         <div id="received-gifts" class="flex flex-wrap gap-2"></div>
       </div>
-
       <div class="mb-8 px-2">
         <p class="font-medium text-lg mb-3 text-stone-700">ให้คะแนนการฟังของตัวเองวันนี้</p>
         <input type="range" id="self-slider" min="0" max="100" value="80" class="w-full accent-amber-500 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
         <div class="flex justify-between text-xs text-stone-400 mt-2"><div>ยังเผลอใจลอย</div><div>อยู่กับปัจจุบันดีมาก</div></div>
       </div>
-
       <div class="mb-8">
         <p class="font-medium text-lg mb-3 text-stone-700">ส่งคำขอบคุณพิเศษให้...</p>
         <div class="flex flex-col gap-3">
@@ -185,13 +186,11 @@
         <p class="font-medium mb-3 text-stone-500">ข้อความถึงคุณ</p>
         <div id="received-appreciations" class="space-y-3"></div>
       </div>
-
       <div class="text-center bg-white rounded-3xl p-6 shadow-sm border border-stone-100">
         <p class="font-medium text-lg mb-4 text-stone-700">บรรยากาศในวงวันนี้เป็นสีอะไร?</p>
         <div id="aura-grid" class="flex justify-center gap-3 mb-4 flex-wrap"></div>
         <div id="aura-result" class="min-h-[3rem] text-xl font-medium text-stone-700"></div>
       </div>
-
       <button onclick="finishGame()" class="mt-12 w-full py-5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-3xl text-xl font-medium shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1">
         จบกิจกรรม
       </button>
@@ -201,13 +200,11 @@
   <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-stone-900/90 text-white px-6 py-3 rounded-full shadow-2xl text-sm z-50 backdrop-blur-sm whitespace-nowrap"></div>
 
   <script>
-    // --- Config ---
     const peerConfig = {
-        debug: 1, // ลด Debug level ลง
+        debug: 1, 
         config: { 'iceServers': [ { url: 'stun:stun.l.google.com:19302' }, { url: 'stun:stun1.l.google.com:19302' } ] }
     };
 
-    // --- State ---
     let peer, conn, myId, roomId, isHost = false, myName = "";
     let players = [], connections = [];
     let receivedGifts = {}, receivedAppreciations = [], auraVotes = [0,0,0,0,0];
@@ -215,7 +212,6 @@
     let currentPhaseIndex = 0, currentRound = 0, timerInterval = null, timeLeft = 90;
     let shuffledSpeakers = [];
 
-    // --- Data ---
     const phases = [
       { name: "Hello", color: "#F4C95D" },
       { name: "Listen", color: "#8AA88A" },
@@ -233,7 +229,6 @@
     const auraColors = ["#fbbf24","#fde047","#34d399","#38bdf8","#c084fc"];
     const auraNames = ["อบอุ่น", "สดใส", "สงบ", "กว้างไกล", "ลึกซึ้ง"];
 
-    // --- Helper UI ---
     function hideAll() { document.querySelectorAll('[id^="screen-"]').forEach(s => s.classList.add('hidden')); }
     function showScreen(id) { hideAll(); document.getElementById(id).classList.remove('hidden'); }
     function showToast(text) {
@@ -242,22 +237,16 @@
       setTimeout(() => t.classList.add('hidden'), 2500);
     }
     
-    // Loading Control
     function showLoading(show, msg="กำลังเชื่อมต่อ...") { 
         const el = document.getElementById('loading-overlay');
         document.getElementById('loading-text').innerText = msg;
         if(show) {
             el.classList.remove('hidden');
-            // Timeout 8 วินาที ถ้ายังไม่หายให้โชว์ปุ่มทางเลือก
-            setTimeout(() => {
-                if(!el.classList.contains('hidden')) document.getElementById('retry-area').classList.remove('hidden');
-            }, 8000);
         } else {
             el.classList.add('hidden');
         }
     }
     
-    // *** สำคัญ: ปุ่มบังคับปิด Loading ***
     function forceCloseLoading() {
         document.getElementById('loading-overlay').classList.add('hidden');
         if(!roomId) showScreen('screen-landing');
@@ -265,7 +254,7 @@
 
     // --- Entry Point ---
     window.onload = () => {
-      // ** FIX: เริ่มต้นต้องซ่อน Loading ก่อนเสมอ เว้นแต่จะมี Room ID **
+      // 1. ซ่อนหน้าโหลดก่อนเลย กันเหนียว
       document.getElementById('loading-overlay').classList.add('hidden');
       
       const params = new URLSearchParams(location.search);
@@ -291,72 +280,60 @@
         if(code) window.location.href = "?room=" + code.trim();
     }
 
-    // --- Network (Host) ---
     function initHost() {
         myName = document.getElementById('host-name').value.trim();
         if(!myName) return alert("ใส่ชื่อก่อนนะครับ");
         isHost = true;
-        
-        // Generate Short ID
         const shortId = Math.random().toString(36).substr(2, 6).toUpperCase();
         roomId = shortId;
-        
         showLoading(true, "กำลังสร้างห้อง...");
         
         try {
             peer = new Peer(shortId, peerConfig);
-            
             peer.on('open', (id) => {
                 players = [{id: 'HOST', name: myName}];
                 showLoading(false);
                 setupWaitingRoom();
             });
-
             peer.on('connection', (c) => {
                 connections.push(c);
                 c.on('data', (data) => handleData(data, c));
-                c.on('close', () => { /* Handle disconnect optional */ });
             });
-
             peer.on('error', (err) => { 
                 alert("เกิดข้อผิดพลาด: " + err); 
-                showLoading(false); 
+                forceCloseLoading(); 
             });
         } catch (e) {
             alert("Browser ไม่รองรับ: " + e);
-            showLoading(false);
+            forceCloseLoading();
         }
     }
 
-    // --- Network (Guest) ---
     function initGuestPeer() {
         try {
             peer = new Peer(null, peerConfig);
-            
             peer.on('open', (id) => {
                 myId = id;
                 conn = peer.connect(roomId, { reliable: true });
-                
                 conn.on('open', () => {
                     showLoading(false);
                     conn.send({ type: 'JOIN', name: myName });
                     setupWaitingRoom(); 
                 });
-
                 conn.on('data', (data) => handleData(data));
-                
-                // ถ้าเชื่อมไม่ได้ภายใน 10 วิ ให้แจ้งเตือน
                 setTimeout(() => {
                     if(!conn.open) {
-                        alert("เชื่อมต่อเจ้าของห้องไม่ได้ (อาจจะคนละวงเน็ต หรือห้องปิดแล้ว)");
+                        alert("เชื่อมต่อห้องไม่ได้ (อาจจะห้องผิด หรือเน็ตมีปัญหา)");
                         forceCloseLoading();
                     }
-                }, 10000);
+                }, 8000);
             });
-
             peer.on('error', (err) => {
                 console.error(err);
-                // PeerJS Error ส่วนใหญ่จะจัดการโดย UI Timeout
+                if(err.type === 'peer-unavailable') {
+                    alert("ไม่พบห้องนี้: " + roomId);
+                    window.location.href = window.location.pathname;
+                }
             });
         } catch (e) {
             alert("Error: " + e);
@@ -404,22 +381,16 @@
         }
     }
 
-    // --- Game Logic ---
     function setupWaitingRoom() {
         document.getElementById('room-id').textContent = roomId;
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
         const url = window.location.origin + window.location.pathname + "?room=" + roomId;
         new QRCode(qrContainer, { text: url, width: 100, height: 100 });
-
         renderPlayerList();
         showScreen('screen-waiting');
         startAttunementQuotes();
-
-        if(isHost) {
-            document.getElementById('start-btn').classList.remove('hidden');
-            document.getElementById('waiting-msg').classList.add('hidden');
-        }
+        if(isHost) document.getElementById('start-btn').classList.remove('hidden');
     }
 
     function renderPlayerList() {
@@ -462,7 +433,6 @@
       el.textContent = quotes[0];
     }
 
-    // Gate
     function hostStartGate() { broadcast({ type: 'GOTO', screen: 'screen-gate' }); }
     function setupGateUI() {
         if(isHost) {
@@ -471,7 +441,6 @@
         }
     }
 
-    // Game Loop
     function hostStartGame() {
         currentPhaseIndex = 0; currentRound = 0;
         shuffledSpeakers = [...players].sort(() => Math.random() - 0.5);
@@ -491,7 +460,6 @@
         if(players.length > 1) {
              while (listenerObj.id === speakerObj.id) listenerObj = players[Math.floor(Math.random() * players.length)];
         }
-
         broadcast({ type: 'GOTO', screen: 'screen-game', payload: {
             phaseName: phase.name, phaseColor: phase.color, question, speaker: speakerObj.name, listener: listenerObj.name
         }});
@@ -499,7 +467,7 @@
 
     function setupGameUI(payload) {
         document.getElementById('phase-name').innerText = payload.phaseName;
-        document.getElementById('phase-name').style.backgroundColor = payload.phaseColor + "40"; // Light BG
+        document.getElementById('phase-name').style.backgroundColor = payload.phaseColor + "40"; 
         document.getElementById('phase-color-bar').style.backgroundColor = payload.phaseColor;
         document.getElementById('question').innerText = payload.question;
         document.getElementById('speaker-name').innerText = payload.speaker;
@@ -522,11 +490,9 @@
     }
 
     function hostStartTimer() { broadcast({ type: 'SYNC_TIMER' }); }
-
     function startTimerLocal() {
         const btn = document.getElementById('timer-btn');
         if(isHost) { btn.innerText = "⏳ กำลังพูด..."; btn.disabled = true; }
-
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             timeLeft--;
@@ -547,7 +513,6 @@
         }, 1000);
     }
 
-    // Wrap Up
     function initWrapUp() {
       renderGiftGrid(); renderReceivedGifts();
       populateAppreciationSelect(); renderReceivedAppreciations();
@@ -608,7 +573,6 @@
         auraVotes.forEach((v,i)=>{if(v>max){max=v;idx=i;}});
         if(max>0) document.getElementById('aura-result').innerHTML = `<span style="color:${auraColors[idx]}">${auraNames[idx]}</span>`;
     }
-
     function finishGame() { if(confirm("ต้องการจบเกมและกลับหน้าแรก?")) location.reload(); }
   </script>
 </body>
