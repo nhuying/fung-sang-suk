@@ -1,0 +1,21 @@
+{
+  "name": "ฟังสร้างสุข",
+  "short_name": "ฟังสร้างสุข",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8f1e3",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1041/1041407.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1041/1041407.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
